@@ -1,186 +1,149 @@
 // src/components/Projects.tsx
-import React from 'react';
-import { ExternalLink } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import React, { useMemo, useState } from 'react';
 
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
+type Category = 'SIEM' | 'SOAR' | 'Detection Rules' | 'Active Directory' | 'ELK';
+
+type Project = {
+  slug: string;
+  title: string;
+  oneLiner: string;
+  categories: Category[];
+  impact: string;
+  link: string; // external link to Medium/GitHub
+  icon: string; // emoji
 };
 
-const item = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
-};
+// --- Data (move to context later if you like) ---
+const DATA: Project[] = [
+  {
+    slug: 'snort3-ids',
+    title: 'Building an IDS with Snort 3',
+    oneLiner: 'End-to-end IDS lab: custom rules, automated updates, PCAP validation.',
+    categories: ['Detection Rules'],
+    impact: 'Operational IDS lab with automated rule updates & PCAP validation.',
+    link: 'https://medium.com/@vignesh3967/building-my-first-ids-lab-with-snort-3-37ac1ebc0345',
+    icon: '🛡️',
+  },
+  {
+    slug: 'ad-detection-response',
+    title: 'Active Directory Detection & Response',
+    oneLiner: '↑ detection accuracy 40% · ↓ response time 85% (RDP brute-force → auto-disable).',
+    categories: ['SIEM', 'SOAR', 'Active Directory'],
+    impact: 'Detection accuracy ↑40%; response time ↓85% via automation.',
+    link: 'https://medium.com/@vignesh3967/building-a-complete-soc-lab-active-directory-detection-response-automation-project-f48d2e82a84f',
+    icon: '🔐',
+  },
+  {
+    slug: 'wazuh-thehive-shuffle',
+    title: 'SOC Automation – Wazuh + TheHive + Shuffle',
+    oneLiner: 'Sysmon → Wazuh → TheHive triage with VirusTotal enrichment; playbooks reduce toil.',
+    categories: ['SOAR', 'SIEM', 'Detection Rules'],
+    impact: 'Manual triage workload reduced ~70%.',
+    link: 'https://medium.com/@vignesh3967/soc-automation-with-soar-9203ed8f33b9',
+    icon: '🛠️',
+  },
+  {
+    slug: 'soar-edr-limacharlie-tines',
+    title: 'SOAR–EDR Integration – LimaCharlie + Tines',
+    oneLiner: 'LaZagne detection triggers automated host isolation; Slack/Email notifications.',
+    categories: ['SOAR'],
+    impact: 'Faster EDR response & clearer visibility.',
+    link: 'https://medium.com/@vignesh3967/soar-edr-project-automating-incident-response-with-limacharlie-and-tines-9754364ec30c',
+    icon: '🧪',
+  },
+  {
+    slug: 'elk-30-day-soc',
+    title: '30-Day SOC Challenge – ELK Stack',
+    oneLiner: 'Elastic ingest + rules + dashboards; alert → OS Ticket automation.',
+    categories: ['ELK', 'SIEM'],
+    impact: 'Streamlined alert handling & standardized tracking.',
+    link: 'https://medium.com/@vignesh3967/installing-elastic-defend-a-step-by-step-guide-to-protecting-your-endpoints-6ee9a0008f96',
+    icon: '📊',
+  },
+  {
+    slug: 'ad-home-lab-splunk',
+    title: 'Active Directory Home Lab with Splunk',
+    oneLiner: 'ATT&CK-mapped detections tuned with Atomic Red Team & Crowbar simulations.',
+    categories: ['Active Directory', 'SIEM'],
+    impact: 'Detection logic quality ↑ ~25% with less noise.',
+    link: 'https://medium.com/@vignesh3967/simulating-cyber-attack-and-analyzing-logs-in-an-active-directory-home-lab-with-splunk-640c4f88e667',
+    icon: '🎯',
+  },
+];
 
-const Projects: React.FC = () => {
-  const { ref, isVisible } = useScrollAnimation();
+const FILTERS: Array<'All' | Category> = ['All', 'SIEM', 'SOAR', 'Detection Rules', 'Active Directory', 'ELK'];
 
-  const projects = [
-    {
-      title: 'Building an IDS with Snort 3',
-      description:
-        'Compiled Snort 3 from source (Hyperscan, Flatbuffers, DAQ), wrote custom rules, automated rule updates with PulledPork3, and validated using malicious PCAPs (e.g., WhisperGate).',
-      impact: 'End-to-end IDS lab: rules, automation, PCAP validation',
-      stack: ['Snort 3', 'PulledPork3', 'Hyperscan', 'Flatbuffers', 'DAQ'],
-      icon: '🛡️',
-      link: 'https://medium.com/@vignesh3967/building-my-first-ids-lab-with-snort-3-37ac1ebc0345',
-    },
-    {
-      title: 'Active Directory Detection & Response',
-      description:
-        'Detected unauthorized RDP attempts in Splunk and automated AD account disablement via LDAP using Shuffle + Slack alerts.',
-      impact: '↑ detection accuracy 40% · ↓ response time 85%',
-      stack: ['Splunk', 'Active Directory', 'Slack', 'Shuffle'],
-      icon: '🔐',
-      link: 'https://medium.com/@vignesh3967/building-a-complete-soc-lab-active-directory-detection-response-automation-project-f48d2e82a84f',
-    },
-    {
-      title: 'SOC Automation – Wazuh + TheHive + Shuffle',
-      description:
-        'Simulated Mimikatz credential dumping with Sysmon; automated triage in TheHive with VirusTotal enrichment and response playbooks.',
-      impact: '↓ manual triage 70%',
-      stack: ['Wazuh', 'Sysmon', 'VirusTotal', 'TheHive', 'Shuffle'],
-      icon: '🛠',
-      link: 'https://medium.com/@vignesh3967/soc-automation-with-soar-9203ed8f33b9',
-    },
-    {
-      title: 'SOAR-EDR Integration – LimaCharlie + Tines',
-      description:
-        'Automated host isolation for Lazagne.exe detections; real-time Slack/Email alerts using Tines playbooks.',
-      impact: 'Faster EDR response & visibility',
-      stack: ['LimaCharlie', 'Tines', 'Python', 'Slack'],
-      icon: '🧪',
-      link: 'https://medium.com/@vignesh3967/soar-edr-project-automating-incident-response-with-limacharlie-and-tines-9754364ec30c',
-    },
-    {
-      title: '30-Day SOC Challenge – ELK Stack',
-      description:
-        'Monitored Windows/Linux telemetry with Elastic; automated alert→ticket creation using OS Ticket.',
-      impact: 'Streamlined alert handling in lab SOC',
-      stack: ['ELK Stack', 'Sysmon', 'OS Ticket'],
-      icon: '📊',
-      link: 'https://medium.com/@vignesh3967/installing-elastic-defend-a-step-by-step-guide-to-protecting-your-endpoints-6ee9a0008f96',
-    },
-    {
-      title: 'Active Directory Home Lab with Splunk',
-      description:
-        'Simulated attacks using Atomic Red Team & Crowbar; tuned Splunk detections and parsing for AD attack patterns.',
-      impact: '↑ detection logic quality 25%',
-      stack: ['Splunk', 'Active Directory', 'Atomic Red Team', 'Crowbar'],
-      icon: '🎯',
-      link: 'https://medium.com/@vignesh3967/simulating-cyber-attack-and-analyzing-logs-in-an-active-directory-home-lab-with-splunk-640c4f88e667',
-    },
-  ];
+export default function Projects() {
+  const [filter, setFilter] = useState<'All' | Category>('All');
+
+  const projects = useMemo(() => {
+    if (filter === 'All') return DATA;
+    return DATA.filter((p) => p.categories.includes(filter));
+  }, [filter]);
 
   return (
     <section
       id="projects"
-      ref={ref}
-      className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black relative overflow-hidden"
+      className="py-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-black"
     >
-      {/* soft background image */}
-      <div className="absolute inset-0 opacity-5">
-        <img
-          src="https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1600"
-          alt="Technology background"
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-      </div>
+      <div className="container mx-auto px-6">
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-10">Featured Projects</h2>
 
-      <div className="container mx-auto px-6 relative z-10">
-        <h2
-          className={`text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent transition-all duration-1000 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          Featured Projects
-        </h2>
-
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-          className="grid md:grid-cols-2 gap-8"
-        >
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.title}
-              variants={item}
-              className={[
-                'group relative overflow-hidden rounded-2xl border',
-                'bg-white dark:bg-gray-800 p-8 shadow-xl hover:shadow-2xl',
-                'transition-all duration-500 hover:-translate-y-2',
-                'border-gray-200 dark:border-gray-700',
-              ].join(' ')}
-              style={{ transitionDelay: `${index * 150}ms` }}
-              onMouseMove={(e) => {
-                const r = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                const x = e.clientX - r.left;
-                const y = e.clientY - r.top;
-                (e.currentTarget as HTMLDivElement).style.setProperty('--x', `${x}px`);
-                (e.currentTarget as HTMLDivElement).style.setProperty('--y', `${y}px`);
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.removeProperty('--x');
-                (e.currentTarget as HTMLDivElement).style.removeProperty('--y');
-              }}
+        {/* Filter chips */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-full text-sm border transition
+                ${filter === f
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white'
+                  : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:border-slate-400'
+                }`}
+              aria-pressed={filter === f}
             >
-              <div className="flex items-start justify-between mb-6">
-                <div className="text-4xl mb-4">{project.icon}</div>
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  title="View Project"
-                >
-                  <ExternalLink size={20} className="text-gray-600 dark:text-gray-300" />
-                </a>
-              </div>
+              {f}
+            </button>
+          ))}
+        </div>
 
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                {project.title}
-              </h3>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {projects.map((p) => (
+            <a
+              key={p.slug}
+              href={p.link}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition
+                         border-slate-200 dark:bg-slate-800 dark:border-slate-700"
+              title={`Open ${p.title}`}
+            >
+              <div className="text-3xl mb-3">{p.icon}</div>
 
-              <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-                {project.description}
-              </p>
+              <h3 className="text-lg font-semibold mb-1 text-slate-900 dark:text-white">{p.title}</h3>
 
-              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg mb-6">
-                <p className="text-green-800 dark:text-green-300 font-medium text-sm">
-                  <span className="font-bold">Impact:</span> {project.impact}
-                </p>
-              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-300">{p.oneLiner}</p>
 
-              <div className="flex flex-wrap gap-2">
-                {project.stack.map((tech) => (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {p.categories.map((c) => (
                   <span
-                    key={tech}
-                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium"
+                    key={c}
+                    className="px-2 py-0.5 text-xs rounded-full
+                               bg-slate-100 text-slate-700 border border-slate-300
+                               dark:bg-slate-700/50 dark:text-slate-200 dark:border-slate-600"
                   >
-                    {tech}
+                    {c}
                   </span>
                 ))}
               </div>
 
-              {/* cursor-follow glow */}
-              <span
-                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  background:
-                    'radial-gradient(220px circle at var(--x,50%) var(--y,50%), rgba(99,102,241,0.18), transparent 40%)',
-                }}
-              />
-            </motion.div>
+              <div className="mt-3 text-sm font-medium text-indigo-600 dark:text-indigo-300 underline underline-offset-4">
+                View Case Study →
+              </div>
+            </a>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
-};
-
-export default Projects;
+}

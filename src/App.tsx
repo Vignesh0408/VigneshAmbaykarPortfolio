@@ -1,19 +1,55 @@
 // src/App.tsx
 import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ErrorBoundary from './components/ErrorBoundary';
 import ScrollProgress from './components/ScrollProgress';
 
-// Lazy-load sections so a bad import won’t crash everything
+// Lazy-load sections
 const Header = React.lazy(() => import('./components/Header'));
 const Hero = React.lazy(() => import('./components/Hero'));
 const About = React.lazy(() => import('./components/About'));
 const Skills = React.lazy(() => import('./components/Skills'));
-const Projects = React.lazy(() => import('./components/Projects'));
+const Projects = React.lazy(() => import('./components/Projects'));   // <-- only Projects
 const Experience = React.lazy(() => import('./components/Experience'));
 const Certifications = React.lazy(() => import('./components/Certifications'));
 const Contact = React.lazy(() => import('./components/Contact'));
 const Footer = React.lazy(() => import('./components/Footer'));
+
+// Home page assembled from your sections
+function HomePage() {
+  return (
+    <>
+      <ErrorBoundary name="Hero">
+        <Hero />
+      </ErrorBoundary>
+
+      <ErrorBoundary name="About">
+        <About />
+      </ErrorBoundary>
+
+      <ErrorBoundary name="Skills">
+        <Skills />
+      </ErrorBoundary>
+
+      <ErrorBoundary name="Projects">
+        <Projects />
+      </ErrorBoundary>
+
+      <ErrorBoundary name="Experience">
+        <Experience />
+      </ErrorBoundary>
+
+      <ErrorBoundary name="Certifications">
+        <Certifications />
+      </ErrorBoundary>
+
+      <ErrorBoundary name="Contact">
+        <Contact />
+      </ErrorBoundary>
+    </>
+  );
+}
 
 export default function App() {
   return (
@@ -26,10 +62,7 @@ export default function App() {
           content="SOC automation, detection engineering, and data analytics projects with measurable impact."
         />
         <meta property="og:title" content="Vignesh Ambaykar · Portfolio" />
-        <meta
-          property="og:description"
-          content="Built Snort 3 IDS, automated compliance reporting, and more."
-        />
+        <meta property="og:description" content="Built Snort 3 IDS, automated compliance reporting, and more." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://vigneshambaykarportfolio.netlify.app/" />
         <meta property="og:image" content="/og-image.png" />
@@ -45,34 +78,31 @@ export default function App() {
           <Header />
         </ErrorBoundary>
 
-        <main id="hero">
-          <ErrorBoundary name="Hero">
-            <Hero />
-          </ErrorBoundary>
+        <main id="content">
+          <Routes>
+            {/* Home (single-page portfolio) */}
+            <Route
+              path="/"
+              element={
+                <ErrorBoundary name="Home">
+                  <HomePage />
+                </ErrorBoundary>
+              }
+            />
 
-          <ErrorBoundary name="About">
-            <About />
-          </ErrorBoundary>
+            {/* Optional: separate /projects page if you want Projects standalone */}
+            <Route
+              path="/projects"
+              element={
+                <ErrorBoundary name="Projects">
+                  <Projects />
+                </ErrorBoundary>
+              }
+            />
 
-          <ErrorBoundary name="Skills">
-            <Skills />
-          </ErrorBoundary>
-
-          <ErrorBoundary name="Projects">
-            <Projects />
-          </ErrorBoundary>
-
-          <ErrorBoundary name="Experience">
-            <Experience />
-          </ErrorBoundary>
-
-          <ErrorBoundary name="Certifications">
-            <Certifications />
-          </ErrorBoundary>
-
-          <ErrorBoundary name="Contact">
-            <Contact />
-          </ErrorBoundary>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
 
         <ErrorBoundary name="Footer">
