@@ -1,3 +1,4 @@
+// src/components/About.tsx
 import React from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
@@ -8,58 +9,138 @@ const About: React.FC = () => {
     <section
       id="about"
       ref={ref}
-      className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black"
+      className="relative py-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-black overflow-hidden"
     >
-      <div className="container mx-auto px-6">
+      {/* soft radial highlight */}
+      <div
+        className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl dark:bg-indigo-500/15"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-500/15"
+        aria-hidden
+      />
+
+      <div className="relative z-10 container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div
-            className={`transition-all duration-1000 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            className={`transition-all duration-700 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            <p className="mb-3 text-sm font-medium tracking-wide uppercase text-slate-500 dark:text-slate-400">
+              A bit about me
+            </p>
+
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
               About Me
             </h2>
 
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                Hi, I'm <span className="font-semibold text-gray-900 dark:text-white">Vignesh</span> — a cybersecurity professional driven by precision, automation, and insight. With an MSc in Information Security from Royal Holloway, I’ve built SOC labs that simulate real-world attacks and automate incident response.
-              </p>
+            <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-5">
+              Hi, I'm <span className="font-semibold text-slate-900 dark:text-white">Vignesh</span> — a
+              cybersecurity professional focused on <strong>detection engineering</strong> and
+              <strong> SOC automation</strong>. With an MSc in Information Security from Royal Holloway, I build
+              reproducible SOC labs, simulate real attacks, and automate incident response so teams can react
+              faster and with more confidence.
+            </p>
 
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                I specialize in <strong>log analysis, threat detection,</strong> and <strong>SOAR integration</strong> across hybrid cloud environments. Whether I’m fine-tuning detection rules or scripting response workflows, my approach is rooted in curiosity, consistency, and continuous learning.
-              </p>
+            <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
+              I specialize in <strong>log analysis</strong>, <strong>threat detection</strong>, and
+              <strong> SOAR integrations</strong> across hybrid cloud. My work style is hands-on and iterative:
+              measure, tune, automate, repeat. Driven by curiosity. Powered by purpose.
+            </p>
 
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-                To me, security isn’t just a job — <span className="font-semibold text-gray-900 dark:text-white">it's a mindset</span>.
-              </p>
+            {/* Specialty chips */}
+            <div
+              className={`mb-8 flex flex-wrap gap-2 transition-all duration-700 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`}
+            >
+              {[
+                'SIEM Engineering',
+                'Detection Rules (ATT&CK)',
+                'SOAR Playbooks',
+                'EDR Response',
+                'Threat Intel Enrichment',
+              ].map((chip) => (
+                <span
+                  key={chip}
+                  className="px-3 py-1 text-xs rounded-full border border-slate-300 bg-white text-slate-700
+                             dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                >
+                  {chip}
+                </span>
+              ))}
             </div>
 
-            <button
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-gray-900 dark:bg-white text-white dark:text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
+            {/* Metrics strip */}
+            <div
+              className={`grid grid-cols-3 gap-4 mb-8 transition-all duration-700 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`}
             >
-              Let's Connect
-            </button>
+              {[
+                { k: 'Projects', v: '6' },
+                { k: 'Detection Uplift', v: '40%' },
+                { k: 'Response Time ↓', v: '85%' },
+              ].map(({ k, v }) => (
+                <div
+                  key={k}
+                  className="rounded-2xl border border-slate-200 bg-white p-4 text-center
+                             dark:border-slate-700 dark:bg-slate-800"
+                >
+                  <div className="text-2xl font-bold text-slate-900 dark:text-white">{v}</div>
+                  <div className="text-xs mt-1 text-slate-600 dark:text-slate-300">{k}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="#projects"
+                className="inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold
+                           bg-slate-900 text-white hover:bg-slate-800 transition
+                           dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+              >
+                View Projects
+              </a>
+              <button
+                onClick={() =>
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+                }
+                className="inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold
+                           border border-slate-300 text-slate-800 bg-white hover:border-slate-500 transition
+                           dark:border-slate-600 dark:text-slate-200 dark:bg-slate-900/40 dark:hover:border-slate-400"
+              >
+                Let’s Connect
+              </button>
+            </div>
           </div>
 
           {/* Image */}
           <div
-            className={`transition-all duration-1000 delay-300 ${
-              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+            className={`transition-all duration-700 delay-150 ${
+              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-3'
             }`}
           >
             <div className="relative">
-              <div className="rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
+              {/* glow ring */}
+              <div
+                className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-indigo-500/40 via-cyan-400/30 to-emerald-400/40
+                           blur opacity-0 md:group-hover:opacity-100 transition pointer-events-none"
+                aria-hidden
+              />
+              <div className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500">
                 <img
                   src="https://i.postimg.cc/59s9pbp3/Soc-image.jpg"
-                  alt="SOC Dashboard"
+                  alt="SOC dashboard"
                   className="w-full h-96 object-cover"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
               </div>
-              <div className="absolute -inset-4 bg-gradient-to-r from-gray-600 to-gray-800 dark:from-gray-400 dark:to-gray-600 rounded-2xl -z-10 opacity-20 blur-xl" />
             </div>
           </div>
         </div>
